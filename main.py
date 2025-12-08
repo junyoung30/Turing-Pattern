@@ -1,45 +1,44 @@
+from fft import run_2d_simulation
 import numpy as np
-from FFT_1D import Solver_fft
+import matplotlib.pyplot as plt
+import pickle
+import argparse
+import os
 
-ns = 8
-Du, k2 = 1.0, 11.0
-
-Dv, k1 = 0.01, 5
-
-T = 128
-dt = 0.5*0.07
-MaxIter = round(T/dt)
-
-Nx = 256
-xleng = 40
-dx = xleng/Nx
-
-x = np.linspace(0.5*dx, xleng-0.5*dx, Nx)
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--Dv", type=float, default=0.01)
+    parser.add_argument("--k1", type=float, default=5)
+    parser.add_argument("--Nx", type=int, default=256)
+    parser.add_argument("--Ny", type=int, default=256)
+    parser.add_argument("--T", type=float, default=128)
+    parser.add_argument("--dt", type=float, default=0.035)
+    parser.add_argument("--seed", type=int, default=1004)
+    parser.add_argument("--ns", type=int, default=8)
     
-np.random.seed(1)
-iu = 1+(k2**2)/25+0.2*(2*np.random.rand(Nx)-1)
-iv = k2/5+0.2*(2*np.random.rand(Nx)-1)
-
-k = 2*np.pi * np.fft.fftfreq(Nx, dx)
-kk = k**2
-
-ou, ov = iu.copy(), iv.copy()
-
-tlist, ulist, vlist = [], [ou.copy()], [ov.copy()]
-
-time = 0
-tlist.append(time)
-
-for it in range(MaxIter):
-    time += dt
+    args = parser.parse_args()
+        
+    results = run_2d_simulation(
+        Nx=args.Nx, 
+        Ny=args.Ny, 
+        T=args.T, 
+        dt=args.dt, 
+        Dv=args.Dv,
+        k1=args.k1,
+        seed=args.seed, 
+        ns=args.ns
+    )
     
-    ff = ou+dt*k1*(ov-ou*ov/(1+ov**2))
-    gg = ov+dt*(k2-ov-4*ou*ov/(1+ov**2))
+    plt.imshow(results['vlist'][-1], cmap='jet')
+    plt.axis('off')
+    plt.show()
     
-    ou = Solver_fft(dt, Du, kk, ff)
-    ov = Solver_fft(dt, Dv, kk, gg)
+    os.makedirs("results", exist_ok=True)
+    save_path = f"results/Dv{args.Dv}_k1_{args.k1}_seed{args.seed}.pkl"
+    with open(save_path, "wb") as f:
+        pickle.dump(results, f)
+        
+    print(f"Simulation complete. Saved to {save_path}")
     
-    if (it+1)%(MaxIter//ns) == 0:
-        tlist.append((it+1)*dt)
-        ulist.append(ou.copy())
-        vlist.append(ov.copy())
+if __name__=="__main__":
+    main()
