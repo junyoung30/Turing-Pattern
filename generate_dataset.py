@@ -11,8 +11,12 @@ def parse_points(inputs):
 
     points = []
     for p in inputs:
-        Dv, k1 = p.split(",")
-        points.append((float(Dv), float(k1)))
+        parts = [x.strip() for x in p.split(",")]
+        if len(parts) != 3:
+            raise ValueError("Expected 'Dv,k1,label'")
+            
+        Dv, k1, label = parts
+        points.append((float(Dv), float(k1), label))
     return points
 
 
@@ -22,8 +26,8 @@ def gen_dataset(args):
     param_points = parse_points(args.points)
     
     idx = 0
-    for (Dv, k1), seed in itertools.product(param_points, args.seeds):
-        print(f"**Running: (Dv={Dv:.4f}, k1={k1}, seed={seed})")
+    for (Dv, k1, label), seed in itertools.product(param_points, args.seeds):
+        print(f"**Running: (label={label}, Dv={Dv:.4f}, k1={k1}, seed={seed})")
         
         results = run_2d_simulation(
             Nx=args.Nx,
@@ -37,6 +41,7 @@ def gen_dataset(args):
             seed=seed,
             ns=args.ns
         )
+        results["pattern"] = {"label": label}
         
         filename = f"{idx}.pkl"
         save_path = os.path.join(args.save_dir, filename)
@@ -53,7 +58,7 @@ def parse_args():
     parser.add_argument(
         "--points", 
         nargs="+",
-        default=["0.01,5", "0.04,1", "0.03,5", "0.04,7"]
+        default=["0.01,5,Sdot", "0.04,1,Ldot", "0.03,5,Line", "0.04,7,Mdot"]
     )
     parser.add_argument(
         "--seeds",
