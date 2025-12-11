@@ -2,6 +2,9 @@ import os
 import numpy as np
 import pickle
 
+from .utils import open_pickle
+
+
 def get_dataset(DirData):
     
     label2idx = {
@@ -13,7 +16,7 @@ def get_dataset(DirData):
 
     X, labels = [], []
     for FileName in FileNames:
-        fpath = os.path.join(DirData, FileName)
+        fpath = os.path.join(DirData, FileName)        
         data = open_pickle(fpath)
     
         vv = data['vlist'][-1]
@@ -28,3 +31,11 @@ def get_dataset(DirData):
     X = np.array(X).reshape(-1,64,64)
     labels = np.array(labels).reshape(-1)
     return X, labels
+
+
+def scaling(X):
+    min_value = np.min(X, axis=(1, 2), keepdims=True)
+    max_value = np.max(X, axis=(1, 2), keepdims=True)
+    
+    X_scaled = (X-min_value)/(max_value-min_value)
+    return X_scaled

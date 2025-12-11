@@ -1,3 +1,9 @@
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import (
+    Input, Conv2D, MaxPooling2D, Flatten, Dense
+)
+
 def CNN(
     input_shape,
     num_classes,
@@ -12,10 +18,10 @@ def CNN(
     model = Sequential()
     model.add(Input(shape=input_shape))
 
-    if num_conv_filers > 0:  ## updated
+    if num_conv_filters > 0:
         for _ in range(num_blocks):
             model.add(Conv2D(
-                num_conv_filters, kernel_size=kernel_size, 
+                num_conv_filters, kernel_size=kernel_size,
                 activation='relu', kernel_initializer=initializer
             ))
             model.add(MaxPooling2D(pool_size=2))
