@@ -19,7 +19,11 @@ pip install -r requirements.txt
 데이터셋을 만들기 전에 해당 파라미터가 어떤 패턴을 생성하는지 확인하는데 활용합니다.
 
 ```bash
-python generate_pattern.py --Dv 0.01 --k1 5 --seed 1004
+python generate_pattern.py \
+    --solver fft_numpy \
+    --Dv 0.01 \
+    --k1 5 \
+    --seed 1004
 ```
 
 ---
