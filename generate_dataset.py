@@ -3,7 +3,7 @@ import argparse
 import os
 import itertools
 
-from solvers.fft_solver import run_2d_simulation
+from solvers import SOLVER_REGISTRY
 
 
 
@@ -23,24 +23,31 @@ def parse_points(inputs):
 def gen_dataset(args):
     os.makedirs(args.save_dir, exist_ok=True)
     
+    SolverClass = SOLVER_REGISTRY[args.solver]
+    solver = SolverClass()
+    
     param_points = parse_points(args.points)
     
     idx = 0
     for (Dv, k1, label), seed in itertools.product(param_points, args.seeds):
-        print(f"**Running: (label={label}, Dv={Dv:.4f}, k1={k1}, seed={seed})")
-        
-        results = run_2d_simulation(
-            Nx=args.Nx,
-            Ny=args.Ny,
-            xleng=args.xleng,
-            yleng=args.yleng,
-            T=args.T,
-            dt=args.dt,
-            Dv=Dv, 
-            k1=k1, 
-            seed=seed,
-            ns=args.ns
+        print(
+            f"**Running: solver={args.solver}, "
+            f"Dv={Dv:.4f}, k1={k1}, seed={seed}"
         )
+        
+        params = {
+            "Nx": args.Nx,
+            "Ny": args.Ny,
+            "xleng": args.xleng,
+            "yleng": args.yleng,
+            "T": args.T,
+            "dt": args.dt,
+            "Dv": Dv,
+            "k1": k1,
+            "ns": args.ns,
+        }
+        
+        results = solver.solve(params=params, seed=seed)
         results["pattern"] = {"label": label}
         
         filename = f"{idx}.pkl"
@@ -54,6 +61,13 @@ def gen_dataset(args):
         
 def parse_args():
     parser = argparse.ArgumentParser()
+    
+    parser.add_argument(
+        "--solver", 
+        type=str, 
+        default="fft_numpy", 
+        choices=list(SOLVER_REGISTRY.keys()),
+    )
     
     parser.add_argument(
         "--points", 
@@ -87,7 +101,6 @@ def main():
     
     args = parse_args()
     gen_dataset(args)
-    
     
     
 if __name__=="__main__":

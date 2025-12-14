@@ -3,7 +3,7 @@ import time
 import argparse
 
 from ml.trainer import prepare_data, train_model, save_results
-from ml.utils import set_global_seed
+from ml.utils import set_global_seed, show_results
 
 
 def parse_args():
@@ -48,6 +48,8 @@ def main():
         BS=args.bs,
         EPOCHS=args.epochs
     )
+    
+    show_results(history)
     
     model_name = (
         f"_CP{args.num_blocks}"

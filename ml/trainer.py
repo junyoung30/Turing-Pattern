@@ -2,6 +2,7 @@ import os
 import time
 import pickle
 import numpy as np
+from tqdm.keras import TqdmCallback
 from tensorflow.keras.optimizers import SGD
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.utils import to_categorical
@@ -73,7 +74,8 @@ def train_model(
         validation_data=(X_test, y_test),
         epochs=EPOCHS,
         shuffle=True,
-        verbose=False,
+        verbose=0,
+        callbacks=[TqdmCallback()]
     )
     
     return model, history

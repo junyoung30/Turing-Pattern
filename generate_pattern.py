@@ -3,12 +3,19 @@ import pickle
 import argparse
 import os
 
-from solvers.fft_solver import run_2d_simulation
+from solvers import SOLVER_REGISTRY
 
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
+    
+    parser.add_argument(
+        "--solver", 
+        type=str, 
+        default="fft_numpy", 
+        choices=list(SOLVER_REGISTRY.keys()),
+    )
     
     parser.add_argument("--Dv", type=float, default=0.01)
     parser.add_argument("--k1", type=float, default=5)
@@ -47,19 +54,27 @@ def main():
     
     args = parse_args()
     
-    print(f"**Running: Dv={args.Dv:.4f}, k1={args.k1}, seed={args.seed}")
-    results = run_2d_simulation(
-        Nx=args.Nx, 
-        Ny=args.Ny, 
-        xleng=args.xleng, 
-        yleng=args.yleng,
-        T=args.T, 
-        dt=args.dt, 
-        Dv=args.Dv,
-        k1=args.k1,
-        seed=args.seed,
-        ns=args.ns
+    print(
+        f"**Running: solver={args.solver}, "
+        f"Dv={args.Dv:.4f}, k1={args.k1}, seed={args.seed}"
     )
+    
+    SolverClass = SOLVER_REGISTRY[args.solver]
+    solver = SolverClass()
+    
+    params = {
+        "Nx": args.Nx,
+        "Ny": args.Ny,
+        "xleng": args.xleng,
+        "yleng": args.yleng,
+        "T": args.T,
+        "dt": args.dt,
+        "Dv": args.Dv,
+        "k1": args.k1,
+        "ns": args.ns,
+    }
+    
+    results = solver.solve(params=params, seed=args.seed)
     
     show_pattern(results)
     save_simulation(results, args)
