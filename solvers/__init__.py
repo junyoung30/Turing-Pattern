@@ -1,5 +1,7 @@
-from .fft_numpy import FFTNumpySolver
+from .fft_numpy import FFTSolverNumpy
+from .fft_jax import FFTSolverJax
 
 SOLVER_REGISTRY = {
-    "fft_numpy": FFTNumpySolver,
+    "fft_numpy": FFTSolverNumpy,
+    "fft_jax": FFTSolverJax,
 }

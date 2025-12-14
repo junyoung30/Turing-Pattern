@@ -1,11 +1,12 @@
 import numpy as np
 from tqdm import tqdm
+import time
 
 from .base import PatternSolver
 
 
 
-class FFTNumpySolver(PatternSolver):
+class FFTSolverNumpy(PatternSolver):
     
     @staticmethod
     def initialize_grid(Nx, Ny, xleng, yleng, k2, seed):    
@@ -16,9 +17,9 @@ class FFTNumpySolver(PatternSolver):
         xx, yy = np.meshgrid(x, y)
 
         np.random.seed(seed)
-        iu = 1 + (k2 ** 2) / 25 + 0.2 * (2 * np.random.rand(*xx.shape) - 1)
-        iv = k2 / 5 + 0.2 * (2 * np.random.rand(*xx.shape) - 1)
-        return xx, yy, iu, iv, dx, dy
+        iu = 1.0 + (k2**2) / 25.0 + 0.2*(2*np.random.rand(*xx.shape)-1)
+        iv = k2/5.0 + 0.2*(2*np.random.rand(*xx.shape)-1)
+        return iu, iv, dx, dy
         
     @staticmethod
     def solver_fft(dt, D, kk, bb):
@@ -50,18 +51,20 @@ class FFTNumpySolver(PatternSolver):
         k2 = params.get("k2", 11.0)
         ns = params.get("ns", 8)
         
-        xx, yy, ou, ov, dx, dy = self.initialize_grid(
+        ou, ov, dx, dy = self.initialize_grid(
             Nx, Ny, xleng, yleng, k2, seed
         )
 
         MaxIter = int(T/dt)
         kk = self.compute_k_grid(Nx, Ny, dx, dy)
+        
+        sim_time = 0
+        tlist, ulist, vlist = [sim_time], [ou.copy()], [ov.copy()]
 
-        tlist, ulist, vlist = [0], [ou.copy()], [ov.copy()]
-
-        time = 0
+        start = time.time()
+        
         for it in tqdm(range(MaxIter)):
-            time += dt
+            sim_time += dt
 
             ff = ou + dt * (k1 * (ov - ou * ov / (1 + ov ** 2)))
             gg = ov + dt * (k2 - ov - 4 * ou * ov / (1 + ov ** 2))
@@ -70,11 +73,13 @@ class FFTNumpySolver(PatternSolver):
             ov = self.solver_fft(dt, Dv, kk, gg)
 
             if (it + 1)%(MaxIter//ns) == 0:
-                tlist.append(time)
+                tlist.append(sim_time)
                 ulist.append(ou.copy())
                 vlist.append(ov.copy())
-
-
+        
+        end = time.time() - start
+        print(f"Generate time: {end:.4f} sec")
+        
         results = {
             "parameters": {
                 "Du":Du, "Dv":Dv, "k1":k1, "k2":k2, 

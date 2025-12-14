@@ -1,7 +1,8 @@
-# Python 3.7.2
+# Python 3.12
 
-tensorflow==2.11.0
+tensorflow
 numpy
 scikit-learn
 matplotlib
 tqdm
+jax
