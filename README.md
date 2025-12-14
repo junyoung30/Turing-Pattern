@@ -14,9 +14,19 @@ pip install -r requirements.txt
 
 ---
 
+### 🔧Solver 옵션
+
+패턴 생성을 위한 여러 수치 해석 solver를 지원합니다.
+`--solver` 옵션을 통해 사용할 solver를 선택할 수 있습니다.
+
+| Solver | Description |
+|--------|-------------|
+| `fft_numpy` | Numpy 기반 FFT Solver (CPU) |
+| `fft_jax`   | JAX 기반 FFT Solver (GPU) |
+
 ### 2) Generate patterns (test)
 선택한 파라미터(Dv, k1)에 대해 2D 패턴을 시뮬레이션합니다. 
-데이터셋을 만들기 전에 해당 파라미터가 어떤 패턴을 생성하는지 확인하는데 활용합니다.
+데이터셋을 구축하기 전에, 해당 파라미터 조합이 어떤 패턴을 생성하는지 사전에 확인하는 용도로 사용합니다.
 
 ```bash
 python generate_pattern.py \
@@ -32,10 +42,10 @@ python generate_pattern.py \
 여러 파라미터 조합과 seeds를 이용해 학습용 데이터셋을 생성합니다.
 
 ```bash
-python generate_dataset.py \ 
+python generate_dataset.py \
     --solver fft_numpy \
     --points 0.01,5,Sdot 0.04,1,Ldot \
-    --seeds 1 2 3 4 5 \
+    --seeds 1 2 3 4 5
 ```
 
 ---
@@ -48,5 +58,5 @@ python train.py \
     --num_blocks 1 \
     --num_conv 6 \
     --aug 0 \
-    --weight_seed 2025 \
+    --weight_seed 2025
 ```
