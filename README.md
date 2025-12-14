@@ -19,7 +19,11 @@ pip install -r requirements.txt
 데이터셋을 만들기 전에 해당 파라미터가 어떤 패턴을 생성하는지 확인하는데 활용합니다.
 
 ```bash
-python generate_pattern.py --Dv 0.01 --k1 5 --seed 1004
+python generate_pattern.py \
+    --solver fft_numpy \
+    --Dv 0.01 \
+    --k1 5 \
+    --seed 1004
 ```
 
 ---
@@ -28,7 +32,10 @@ python generate_pattern.py --Dv 0.01 --k1 5 --seed 1004
 여러 파라미터 조합과 seeds를 이용해 학습용 데이터셋을 생성합니다.
 
 ```bash
-python generate_dataset.py --points 0.01,5,Sdot 0.04,1,Ldot --seeds 1 2 3 4 5
+python generate_dataset.py \ 
+    --solver fft_numpy \
+    --points 0.01,5,Sdot 0.04,1,Ldot \
+    --seeds 1 2 3 4 5 \
 ```
 
 ---
@@ -37,5 +44,9 @@ python generate_dataset.py --points 0.01,5,Sdot 0.04,1,Ldot --seeds 1 2 3 4 5
 생성된 데이터셋을 기반으로 CNN 모델을 학습합니다.
 
 ```bash
-python train.py --num_blocks 1 --num_conv 6 --aug 0 --weight_seed 2025
+python train.py \
+    --num_blocks 1 \
+    --num_conv 6 \
+    --aug 0 \
+    --weight_seed 2025 \
 ```
