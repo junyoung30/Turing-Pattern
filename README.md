@@ -1,4 +1,4 @@
-# Turing Pattern Classification
+# 🦓 Turing Pattern Classification
 
 본 프로젝트는 반응-확산 방정식(Reaction-Diffusion System)을 기반으로 2차원 튜링 패턴을 시뮬레이션하고, 생성된 패턴 데이터를 이용하여 CNN 모델을 학습·분류하는 End-to-End 파이프라인을 제공합니다.
 
